@@ -12,6 +12,9 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import net.kyori.adventure.text.Component;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
 
 import com.velocitypowered.api.event.connection.PreLoginEvent;
@@ -98,12 +101,14 @@ public class Boulder {
         }
     }
 
-    public void sendNotificationToStaff(String message) {
-        TextComponent notification = Component.text(message);
+    public void sendNotificationToStaff(String message, String uuid) {
+        TextComponent stringToSend = Component.text("[Boulder] ", TextColor.color(0x67689E))
+                .append(Component.text(message, TextColor.color((0xFFFFFF))))
+                .clickEvent(ClickEvent.runCommand("/whitelist add " + uuid));
 
         for (Player player : server.getAllPlayers()) {
             if (player.hasPermission("boulder.notify")) {
-                player.sendMessage(notification);
+                player.sendMessage(stringToSend);
             }
         }
     }
@@ -115,7 +120,7 @@ public class Boulder {
         if (!whitelist.contains(username)) {
             event.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text("You have not been whitelisted on this server. Please contact a moderator for access.")));
             logger.info("Denied login from {} with UUID {} and IP {}.", event.getUsername(), event.getUniqueId(), event.getConnection().getRemoteAddress());
-            sendNotificationToStaff("User " + event.getUsername() + " tried to login. ");
+            sendNotificationToStaff("User " + event.getUsername() + " with UUID " + event.getUniqueId() + " tried to login. Click HERE and press enter to whitelist them.", event.getUniqueId().toString());
         }
     }
 

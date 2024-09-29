@@ -10,7 +10,7 @@ Work is still in development to make this production-ready (see roadmap below), 
 ### Roadmap:
 - [x] Initial whitelist support
 - [ ] UUID support
-  - [ ] Message online staff with `boulder.notify` (and console) the blocked UUID
+  - [x] Message online staff with `boulder.notify` (and console) the blocked UUID
   - [ ] Allow whitelisting a connection attempt by command
     - [ ] Suggest these commands from clickable chat components
     - [ ] Allow whitelisting by username, with UUID mapped from the connection attempt
