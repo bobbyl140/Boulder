@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
 
@@ -109,6 +108,17 @@ public class Boulder {
         }
     }
 
+    public void sendNotificationToStaff(String message) {
+        TextComponent stringToSend = Component.text("[Boulder] ", TextColor.color(0x67689E))
+                .append(Component.text(message, TextColor.color((0xFFFFFF))));
+
+        for (Player player : server.getAllPlayers()) {
+            if (player.hasPermission("boulder.notify")) {
+                player.sendMessage(stringToSend);
+            }
+        }
+    }
+
     public void sendNotificationToStaff(String message, String uuid) {
         TextComponent stringToSend = Component.text("[Boulder] ", TextColor.color(0x67689E))
                 .append(Component.text(message, TextColor.color((0xFFFFFF))))
@@ -123,11 +133,12 @@ public class Boulder {
 
     @Subscribe
     public void onPreLogin(PreLoginEvent event) {
-        String username = event.getUsername();
+        UUID account = event.getUniqueId();
 
-        if (!whitelist.contains(username)) {
+        if (isValidUUID(account.toString()) && !whitelist.contains(account.toString())) {
             event.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text("You have not been whitelisted on this server. Please contact a moderator for access.")));
-            logger.info("Denied login from {} with UUID {} and IP {}.", event.getUsername(), event.getUniqueId(), event.getConnection().getRemoteAddress());
+            logger.info("User {} with UUID {} tried to login.", event.getUsername(), event.getUniqueId());
+            logger.info("To whitelist this user, run the following: /whitelist add " + account);
             sendNotificationToStaff("User " + event.getUsername() + " with UUID " + event.getUniqueId() + " tried to login. Click HERE and press enter to whitelist them.", event.getUniqueId().toString());
         }
     }
@@ -160,7 +171,8 @@ public class Boulder {
                     String uuidAdd = args[1];
                     if (whitelist.add(uuidAdd)) {
                         saveWhitelist();
-                        source.sendMessage(Component.text("Player has been added to the whitelist"));
+                        // source.sendMessage(Component.text("UUID ").append(Component.text(uuidAdd)).append(Component.text(" has been added to the whitelist.")));
+                        sendNotificationToStaff("UUID " + uuidAdd + " has been added to the whitelist by " + ((Player)source).getUsername() + ".");
                     } else {
                         source.sendMessage(Component.text("That player is already on the whitelist!"));
                     }
@@ -173,7 +185,8 @@ public class Boulder {
                     String uuidRemove = args[1];
                     if (whitelist.remove(uuidRemove)) {
                         saveWhitelist();
-                        source.sendMessage(Component.text("Player has been removed from the whitelist"));
+                        // source.sendMessage(Component.text("Player has been removed from the whitelist"));
+                        sendNotificationToStaff("UUID " + uuidRemove + " has been removed from the whitelist by " + ((Player)source).getUsername() + ".");
                     } else {
                         source.sendMessage(Component.text("That player is not on the whitelist!"));
                     }
