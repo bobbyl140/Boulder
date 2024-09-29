@@ -122,7 +122,7 @@ public class Boulder {
     public void sendNotificationToStaff(String message, String uuid) {
         TextComponent stringToSend = Component.text("[Boulder] ", TextColor.color(0x67689E))
                 .append(Component.text(message, TextColor.color((0xFFFFFF))))
-                .clickEvent(ClickEvent.runCommand("/whitelist add " + uuid));
+                .clickEvent(ClickEvent.suggestCommand("/whitelist add " + uuid));
 
         for (Player player : server.getAllPlayers()) {
             if (player.hasPermission("boulder.notify")) {
