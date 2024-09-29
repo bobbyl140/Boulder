@@ -10,10 +10,11 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import net.kyori.adventure.text.Component;
+import com.velocitypowered.api.proxy.Player;
+import net.kyori.adventure.text.TextComponent;
 import org.slf4j.Logger;
 
 import com.velocitypowered.api.event.connection.PreLoginEvent;
-import com.velocitypowered.api.plugin.annotation.DataDirectory;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -97,13 +98,24 @@ public class Boulder {
         }
     }
 
+    public void sendNotificationToStaff(String message) {
+        TextComponent notification = Component.text(message);
+
+        for (Player player : server.getAllPlayers()) {
+            if (player.hasPermission("boulder.notify")) {
+                player.sendMessage(notification);
+            }
+        }
+    }
+
     @Subscribe
     public void onPreLogin(PreLoginEvent event) {
         String username = event.getUsername();
 
         if (!whitelist.contains(username)) {
             event.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text("You have not been whitelisted on this server. Please contact a moderator for access.")));
-            logger.info("Denied login from " + event.getUsername() + " with UUID " + event.getUniqueId() + " and IP " + event.getConnection().getRemoteAddress() + ".");
+            logger.info("Denied login from {} with UUID {} and IP {}.", event.getUsername(), event.getUniqueId(), event.getConnection().getRemoteAddress());
+            sendNotificationToStaff("User " + event.getUsername() + " tried to login. ");
         }
     }
 
