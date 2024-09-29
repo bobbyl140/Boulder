@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Plugin(
         id = "boulder",
@@ -51,7 +52,7 @@ public class Boulder {
 
         loadWhitelist();
 
-        logger.info("Plugin is working!");
+        logger.info("Plugin enabled!");
     }
 
     @Subscribe
@@ -73,7 +74,6 @@ public class Boulder {
             }
         }
         if (Files.exists(whitelistFile)) {
-            logger.info("File exists");
             try {
                 List<String> lines = Files.readAllLines(whitelistFile);
                 whitelist.addAll(lines);
@@ -82,7 +82,6 @@ public class Boulder {
                 logger.error("Failed to load whitelist", e);
             }
         } else {
-            logger.info("File does not exist");
             try {
                 Files.createFile(whitelistFile);
                 logger.info("Whitelist file created");
@@ -98,6 +97,15 @@ public class Boulder {
             logger.info("Whitelist saved");
         } catch (IOException e) {
             logger.error("Failed to save whitelist", e);
+        }
+    }
+
+    private static boolean isValidUUID(String uuid) {
+        try {
+            UUID.fromString(uuid);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 
@@ -132,41 +140,46 @@ public class Boulder {
             String[] args = invocation.arguments();
 
             if (args.length == 0) {
-                source.sendPlainMessage("Usage: /whitelist add|remove <username>");
+                source.sendPlainMessage("Usage: /whitelist add|remove <UUID>");
                 return;
             }
 
             String action = args[0];
 
+            if (!isValidUUID(args[1])) {
+                source.sendPlainMessage("Invalid UUID.");
+                return;
+            }
+
             switch (action.toLowerCase()) {
                 case "add":
                     if (args.length < 2) {
-                        source.sendPlainMessage("Usage: /whitelist add <username>");
+                        source.sendPlainMessage("Usage: /whitelist add <UUID>");
                         return;
                     }
-                    String usernameAdd = args[1];
-                    if (whitelist.add(usernameAdd)) {
+                    String uuidAdd = args[1];
+                    if (whitelist.add(uuidAdd)) {
                         saveWhitelist();
-                        source.sendMessage(Component.text(usernameAdd + " has been added to the whitelist"));
+                        source.sendMessage(Component.text("Player has been added to the whitelist"));
                     } else {
-                        source.sendMessage(Component.text(usernameAdd + " is already on the whitelist!"));
+                        source.sendMessage(Component.text("That player is already on the whitelist!"));
                     }
                     break;
                 case "remove":
                     if (args.length < 2) {
-                        source.sendPlainMessage("Usage: /whitelist remove <username>");
+                        source.sendPlainMessage("Usage: /whitelist remove <UUID>");
                         return;
                     }
-                    String usernameRemove = args[1];
-                    if (whitelist.remove(usernameRemove)) {
+                    String uuidRemove = args[1];
+                    if (whitelist.remove(uuidRemove)) {
                         saveWhitelist();
-                        source.sendMessage(Component.text(usernameRemove + " has been removed from the whitelist"));
+                        source.sendMessage(Component.text("Player has been removed from the whitelist"));
                     } else {
-                        source.sendMessage(Component.text(usernameRemove + " is not on the whitelist!"));
+                        source.sendMessage(Component.text("That player is not on the whitelist!"));
                     }
                     break;
                 default:
-                    source.sendPlainMessage("Usage: /whitelist add|remove <username>");
+                    source.sendPlainMessage("Usage: /whitelist add|remove <UUID>");
             }
         }
 
