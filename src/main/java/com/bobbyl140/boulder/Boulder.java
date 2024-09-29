@@ -131,7 +131,6 @@ public class Boulder {
                     if (whitelist.add(usernameAdd)) {
                         saveWhitelist();
                         source.sendMessage(Component.text(usernameAdd + " has been added to the whitelist"));
-                        logger.info("Added {} to the whitelist", usernameAdd);
                     } else {
                         source.sendMessage(Component.text(usernameAdd + " is already on the whitelist!"));
                     }
@@ -145,7 +144,6 @@ public class Boulder {
                     if (whitelist.remove(usernameRemove)) {
                         saveWhitelist();
                         source.sendMessage(Component.text(usernameRemove + " has been removed from the whitelist"));
-                        logger.info("Removed {} from the whitelist", usernameRemove);
                     } else {
                         source.sendMessage(Component.text(usernameRemove + " is not on the whitelist!"));
                     }
