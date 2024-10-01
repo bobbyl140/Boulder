@@ -52,7 +52,7 @@ public class Boulder {
 
         loadWhitelist();
 
-        logger.info("Plugin enabled!");
+        logger.info("Plugin fully loaded!");
     }
 
     @Subscribe
@@ -70,7 +70,7 @@ public class Boulder {
             try {
                 Files.createDirectory(dataDirectory);
             } catch (IOException e) {
-                logger.error("Could not create directory for whitelist", e);
+                logger.error("Could not create directory for whitelist.", e);
             }
         }
         if (Files.exists(whitelistFile)) {
@@ -79,14 +79,14 @@ public class Boulder {
                 whitelist.addAll(lines);
                 logger.info("Whitelist loaded with {} entries", whitelist.size());
             } catch (IOException e) {
-                logger.error("Failed to load whitelist", e);
+                logger.error("Failed to load whitelist.", e);
             }
         } else {
             try {
                 Files.createFile(whitelistFile);
-                logger.info("Whitelist file created");
+                logger.info("Whitelist file created.");
             } catch (IOException e) {
-                logger.error("Failed to create whitelist", e);
+                logger.error("Failed to create whitelist.", e);
             }
         }
     }
@@ -94,9 +94,9 @@ public class Boulder {
     private void saveWhitelist() {
         try {
             Files.write(whitelistFile, whitelist);
-            logger.info("Whitelist saved");
+            logger.info("Whitelist saved.");
         } catch (IOException e) {
-            logger.error("Failed to save whitelist", e);
+            logger.error("Failed to save whitelist.", e);
         }
     }
 
