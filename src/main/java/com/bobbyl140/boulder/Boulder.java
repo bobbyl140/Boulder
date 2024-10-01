@@ -7,6 +7,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import net.kyori.adventure.text.Component;
@@ -148,6 +149,7 @@ public class Boulder {
         @Override
         public void execute(Invocation invocation) {
             CommandSource source = invocation.source();
+
             String[] args = invocation.arguments();
 
             if (args.length == 0) {
@@ -171,8 +173,11 @@ public class Boulder {
                     String uuidAdd = args[1];
                     if (whitelist.add(uuidAdd)) {
                         saveWhitelist();
-                        // source.sendMessage(Component.text("UUID ").append(Component.text(uuidAdd)).append(Component.text(" has been added to the whitelist.")));
-                        sendNotificationToStaff("UUID " + uuidAdd + " has been added to the whitelist by " + ((Player)source).getUsername() + ".");
+                        if (invocation.source() instanceof Player) {
+                            sendNotificationToStaff("UUID " + uuidAdd + " has been added to the whitelist by " + ((Player)source).getUsername() + ".");
+                        } else if (invocation.source() instanceof ConsoleCommandSource) {
+                            sendNotificationToStaff("UUID " + uuidAdd + " has been added to the whitelist by CONSOLE.");
+                        }
                     } else {
                         source.sendMessage(Component.text("That player is already on the whitelist!"));
                     }
@@ -185,8 +190,11 @@ public class Boulder {
                     String uuidRemove = args[1];
                     if (whitelist.remove(uuidRemove)) {
                         saveWhitelist();
-                        // source.sendMessage(Component.text("Player has been removed from the whitelist"));
-                        sendNotificationToStaff("UUID " + uuidRemove + " has been removed from the whitelist by " + ((Player)source).getUsername() + ".");
+                        if (invocation.source() instanceof Player) {
+                            sendNotificationToStaff("UUID " + uuidRemove + " has been removed from the whitelist by " + ((Player)source).getUsername() + ".");
+                        } else if (invocation.source() instanceof ConsoleCommandSource) {
+                            sendNotificationToStaff("UUID " + uuidRemove + " has been removed from the whitelist by CONSOLE.");
+                        }
                     } else {
                         source.sendMessage(Component.text("That player is not on the whitelist!"));
                     }
