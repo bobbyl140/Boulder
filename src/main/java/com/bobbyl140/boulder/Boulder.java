@@ -16,7 +16,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
-
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 
@@ -77,7 +76,31 @@ public class Boulder {
         if (Files.exists(whitelistFile)) {
             try {
                 List<String> lines = Files.readAllLines(whitelistFile);
-                whitelist.addAll(lines);
+                whitelist.clear();
+
+                for (String line : lines) {
+                    String uuid = line.trim();
+                    if (uuid.isEmpty()) {
+                        continue;
+                    }
+                    if (uuid.startsWith("#") || uuid.startsWith("//")) {
+                        continue;
+                    }
+
+                    try {
+                        try {
+                            if (UUID.fromString(line).toString().equals(line)) {
+                                whitelist.add(line);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            logger.info("Invalid UUID: {}", line);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        logger.warn("Invalid UUID format: {}", uuid);
+                    }
+
+                }
+
                 logger.info("Whitelist loaded with {} entries", whitelist.size());
             } catch (IOException e) {
                 logger.error("Failed to load whitelist.", e);
@@ -161,17 +184,16 @@ public class Boulder {
 
             String action = args[0];
 
-            if (!isValidUUID(args[1])) {
-                source.sendPlainMessage("Invalid UUID.");
-                return;
-            }
-
             switch (action.toLowerCase()) {
                 case "reload":
                     loadWhitelist();
                     source.sendPlainMessage("Whitelist reloaded.");
                     break;
                 case "add":
+                    if (!isValidUUID(args[1])) {
+                        source.sendPlainMessage("Invalid UUID.");
+                        return;
+                    }
                     if (args.length < 2) {
                         source.sendPlainMessage("Usage: /whitelist add <UUID>");
                         return;
@@ -189,6 +211,10 @@ public class Boulder {
                     }
                     break;
                 case "remove":
+                    if (!isValidUUID(args[1])) {
+                        source.sendPlainMessage("Invalid UUID.");
+                        return;
+                    }
                     if (args.length < 2) {
                         source.sendPlainMessage("Usage: /whitelist remove <UUID>");
                         return;
