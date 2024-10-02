@@ -154,7 +154,8 @@ public class Boulder {
             String[] args = invocation.arguments();
 
             if (args.length == 0) {
-                source.sendPlainMessage("Usage: /whitelist add|remove <UUID>");
+                source.sendPlainMessage("Usage: /whitelist <add|remove> <UUID>");
+                source.sendPlainMessage("Usage: /whitelist <reload>");
                 return;
             }
 
@@ -166,6 +167,10 @@ public class Boulder {
             }
 
             switch (action.toLowerCase()) {
+                case "reload":
+                    loadWhitelist();
+                    source.sendPlainMessage("Whitelist reloaded.");
+                    break;
                 case "add":
                     if (args.length < 2) {
                         source.sendPlainMessage("Usage: /whitelist add <UUID>");
@@ -202,6 +207,7 @@ public class Boulder {
                     break;
                 default:
                     source.sendPlainMessage("Usage: /whitelist add|remove <UUID>");
+                    source.sendPlainMessage("Usage: /whitelist <reload>");
             }
         }
 
