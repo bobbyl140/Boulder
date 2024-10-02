@@ -18,6 +18,7 @@ import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
 
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -133,14 +134,14 @@ public class Boulder {
     }
 
     @Subscribe
-    public void onPreLogin(PreLoginEvent event) {
-        UUID account = event.getUniqueId();
+    public void onPostLogin(PostLoginEvent event) {
+        UUID account = event.getPlayer().getUniqueId();
 
         if (isValidUUID(account.toString()) && !whitelist.contains(account.toString())) {
-            event.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text("You have not been whitelisted on this server. Please contact a moderator for access.")));
-            logger.info("User {} with UUID {} tried to login.", event.getUsername(), event.getUniqueId());
+            event.getPlayer().disconnect(Component.text("You have not been whitelisted on this server. Please contact a moderator for access."));
+            logger.info("User {} with UUID {} tried to login.", event.getPlayer().getUsername(), event.getPlayer().getUsername());
             logger.info("To whitelist this user, run the following: /whitelist add " + account);
-            sendNotificationToStaff("User " + event.getUsername() + " with UUID " + event.getUniqueId() + " tried to login. Click HERE and press enter to whitelist them.", event.getUniqueId().toString());
+            sendNotificationToStaff("User " + event.getPlayer().getUsername() + " with UUID " + event.getPlayer().getUniqueId() + " tried to login. Click HERE and press enter to whitelist them.", event.getPlayer().getUniqueId().toString());
         }
     }
 
